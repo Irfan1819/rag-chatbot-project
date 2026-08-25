@@ -1,64 +1,84 @@
-# RAG Document Q&A Chatbot
+import os
+import glob
+import numpy as np
+from numpy.linalg import norm
+from dotenv import load_dotenv
+from groq import Groq
+from sentence_transformers import SentenceTransformer
+import streamlit as st
 
-A command-line and web-based application that answers questions based on your own documents using Retrieval-Augmented Generation (RAG). Instead of relying only on general AI knowledge, this tool retrieves the most relevant information from your files before generating an answer.
 
-## How it works
+load_dotenv()
 
-1. Loads and splits text documents into chunks
-2. Converts each chunk into an embedding (a numerical representation of its meaning) using `sentence-transformers`
-3. When you ask a question, it finds the top 3 most relevant chunks using cosine similarity
-4. Sends your question + the retrieved context to an LLM (via Groq API) to generate a grounded answer
+client=Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-## Interface
+@st.cache_resource
+def load_model():
+    return SentenceTransformer('all-MiniLM-L6-v2')
 
-This project includes two ways to interact with it:
+@st.cache_resource
+def load_documents():
+    model=load_model()
 
-- **Terminal version** (`document_qa.py`) — command-line chat interface
-- **Web version** (`app.py`) — browser-based chat interface built with Streamlit
+    chunks=[]
 
-## Tech stack
+    for filepath in glob.glob("documents/*.txt"):
+        with open(filepath,"r") as file:
+            text = file.read()
+        file_chunks = [c.strip() for c in text.split("\n\n") if c.strip()]
+        chunks.extend(file_chunks)
+    embeddings = model.encode(chunks)
+    return chunks, embeddings
 
-- Python
-- Groq API (LLM inference)
-- sentence-transformers (embeddings)
-- NumPy (similarity calculations)
-- Streamlit (web interface)
+model = load_model()
+chunks, embeddings = load_documents()
 
-## Setup
+def find_relevant_chunks(question, top_n=3):
+    question_embedding = model.encode([question])[0]
+    similarities = [
+        np.dot(question_embedding, c) / (norm(question_embedding) * norm(c))
+        for c in embeddings
+    ]
+    top_indices = np.argsort(similarities)[::-1][:top_n]
+    return [chunks[i] for i in top_indices]
 
-1. Clone this repo
-2. Install dependencies:
+# --- Web UI starts here ---
+st.title("📄 Document Q&A Chatbot")
+st.write("Ask questions about the documents in your knowledge base.")
 
-```
-pip install groq python-dotenv sentence-transformers numpy streamlit
-```
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-3. Create a `.env` file with your Groq API key:
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.write(msg["content"])
 
-```
-GROQ_API_KEY=your-key-here
-```
+question = st.chat_input("Ask a question...")
 
-4. Add `.txt` files to the `documents/` folder
-5. Run the app:
+if question:
+    st.session_state.messages.append({"role": "user", "content": question})
+    with st.chat_message("user"):
+        st.write(question)
 
-- Terminal version:
-```
-python document_qa.py
-```
+    relevant_chunks = find_relevant_chunks(question)
+    context = "\n\n".join(relevant_chunks)
 
-- Web version:
-```
-streamlit run app.py
-```
+    prompt = f"""Answer the question based only on the context below. 
+If the answer isn't in the context, say "I don't know based on the document."
 
-## Example
+Context: {context}
 
-```
-You: What is RAG?
-AI: RAG, or Retrieval-Augmented Generation, is a technique where an AI model retrieves relevant information from a knowledge base before generating an answer, making responses more accurate and grounded in real data.
-```
+Question: {question}"""
 
-## What I learned
+    response = client.chat.completions.create(
+        model="openai/gpt-oss-20b",
+        max_tokens=500,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    answer = response.choices[0].message.content
 
-Built this project to learn the fundamentals of RAG systems — chunking, embeddings, semantic search, and grounding LLM responses in external data. Also learned how to build a simple web interface for an AI application using Streamlit, and how to handle API keys securely using environment variables.
+    st.session_state.messages.append({"role": "assistant", "content": answer})
+    with st.chat_message("assistant"):
+        st.write(answer)
+
+
