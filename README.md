@@ -1,17 +1,17 @@
-# RAG Document Q&A Chatbot
+#  RAG Document Q&A Chatbot
 
 A command-line application that answers questions based on your own documents using 
 Retrieval-Augmented Generation (RAG). Instead of relying only on general AI knowledge, 
 this tool retrieves the most relevant information from your files before generating an answer.
 
-## How it works
+##  How it works
 
 1. Loads and splits text documents into chunks
 2. Converts each chunk into an embedding (a numerical representation of its meaning) using `sentence-transformers`
 3. When you ask a question, it finds the top 3 most relevant chunks using cosine similarity
 4. Sends your question + the retrieved context to an LLM (via Groq API) to generate a grounded answer
 
-## Tech stack
+##  Tech stack
 
 - Python
 - Groq API (LLM inference)
@@ -19,7 +19,7 @@ this tool retrieves the most relevant information from your files before generat
 - NumPy (similarity calculations)
 
 
-## Setup
+##  Setup
 
 1. Clone this repo
 2. Install dependencies:
@@ -35,7 +35,7 @@ GROQ_API_KEY=your-key-here
 
 python document_qa.py
 
-## Example
+##  Example
 
 You: What is RAG?
 
