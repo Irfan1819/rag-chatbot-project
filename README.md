@@ -38,4 +38,5 @@ python document_qa.py
 ## Example
 
 You: What is RAG?
+
 AI: RAG, or Retrieval-Augmented Generation, is a technique where an AI model retrieves relevant information from a knowledge base before generating an answer...
