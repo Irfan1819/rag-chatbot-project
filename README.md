@@ -16,7 +16,7 @@ this tool retrieves the most relevant information from your files before generat
 - Python
 - Groq API (LLM inference)
 - sentence-transformers (embeddings)
-- NumPy (similarity calculations
+- NumPy (similarity calculations)
 
 
 ## Setup
