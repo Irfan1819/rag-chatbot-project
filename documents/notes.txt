@@ -1,0 +1,14 @@
+Python is a high-level programming language created by Guido van Rossum in 1991.
+It is known for its simple, readable syntax, making it popular for beginners.
+
+Python supports multiple programming paradigms including procedural, object-oriented,
+and functional programming.
+
+Lists in Python are ordered, mutable collections that can hold items of different data types.
+They are defined using square brackets, like [1, 2, 3].
+
+Dictionaries in Python store data as key-value pairs, defined using curly braces.
+They allow fast lookups by key, similar to a real-world dictionary.
+
+Python is widely used in AI and machine learning due to libraries like TensorFlow,
+PyTorch, and scikit-learn, which simplify building and training models.

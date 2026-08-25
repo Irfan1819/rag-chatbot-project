@@ -1,0 +1,15 @@
+Machine learning is a subset of artificial intelligence that allows computers to learn
+patterns from data without being explicitly programmed for every task.
+
+Supervised learning involves training a model on labeled data, where the correct answer
+is already known, so the model learns to map inputs to outputs.
+
+Unsupervised learning works with unlabeled data, where the model tries to find hidden
+patterns or groupings on its own, such as clustering similar items together.
+
+Neural networks are inspired by the human brain and consist of layers of connected nodes
+that process information, forming the foundation of deep learning.
+
+RAG, or Retrieval-Augmented Generation, is a technique where an AI model retrieves relevant
+information from a knowledge base before generating an answer, making responses more accurate
+and grounded in real data.
